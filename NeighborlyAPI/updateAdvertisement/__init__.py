@@ -2,6 +2,7 @@ import azure.functions as func
 import pymongo
 from bson.objectid import ObjectId
 import os
+import requests
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -19,6 +20,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             filter_query = {'_id': ObjectId(id)}
             update_query = {"$set": eval(request)}
             rec_id1 = collection.update_one(filter_query, update_query)
+            # send email when http is triggered
+            logic_app_url = os.environ["LogicAppEndpoint"]
+            response = requests.get(logic_app_url)
             return func.HttpResponse(status_code=200)
         except:
             print("could not connect to mongodb")
